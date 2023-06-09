@@ -42,8 +42,8 @@ function filterPizzas(pizzas) {
   return pizzas;
 }
 
-function displayPizzas(pizzas) {
-  pizzaListDiv.innerHTML = ''; // clear the pizza list
+function createPizzaDiv(pizzas) {
+  pizzaListDiv.innerHTML = '';
 
   pizzas.forEach((pizza) => {
     let pizzaDiv = document.createElement('div');
@@ -70,7 +70,7 @@ function displayPizzas(pizzas) {
 async function fetchAndDisplayPizzas() {
   let pizzas = await fetchData('http://localhost:3000/api/pizza/allergens');
   pizzas = filterPizzas(pizzas);
-  displayPizzas(pizzas);
+  createPizzaDiv(pizzas);
 }
 
 // main
