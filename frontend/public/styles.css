@@ -1,3 +1,34 @@
+.main-container {
+  display: flex;
+}
+
+.content {
+  flex: 1; /* This tells the content to take up all available space */
+}
+
+.sidebar {
+  width: 300px; /* Adjust width to your liking */
+  position: fixed; /* This will make the sidebar stick to the top of the viewport */
+  right: 0; /* It will stick to the right side */
+  top: 0; /* It will stick to the top */
+  height: 100vh; /* This makes sure it covers the full height of the viewport */
+  overflow-y: auto; /* This allows scrolling within the order form if it exceeds the height of the viewport */
+}
+
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  margin-right: 10px;
+}
+
+#order-summary {
+  font-size: 25px !important; /* Change this to the size you want */
+}
+
 /* W3.CSS 4.15 December 2020 by Jan Egil and Borge Refsnes */
 html {
   box-sizing: border-box;
