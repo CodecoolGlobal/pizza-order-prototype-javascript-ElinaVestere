@@ -72,5 +72,24 @@
       </div>
     </div>
     <script src="./public/script.js"></script>
+    <!-- Order -->
+    <div
+      id="orderForm"
+      class="w3-container w3-white w3-padding-32"
+      style="display: none">
+      <h1 class="w3-center w3-jumbo w3-padding-32">Your Order</h1>
+      <div id="orderSummary" class="w3-container w3-margin w3-center"></div>
+      <form id="customerForm" class="w3-container w3-margin w3-center">
+        <label for="name">Name</label>
+        <input type="text" id="name" />
+        <label for="email">Email</label>
+        <input type="email" id="email" />
+        <label for="city">City</label>
+        <input type="text" id="city" />
+        <label for="street">Street</label>
+        <input type="text" id="street" />
+        <button type="button" onclick="submitOrder()">Submit Order</button>
+      </form>
+    </div>
   </body>
 </html>
