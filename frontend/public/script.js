@@ -100,6 +100,41 @@ function addToOrder(pizzaId) {
   displayOrderForm();
 }
 
+function createDecreaseBtn(pizzaOrder, pizzaLine) {
+  let decreaseButton = document.createElement('button');
+  decreaseButton.classList.add('decrease-Btn');
+  decreaseButton.textContent = '-';
+  decreaseButton.addEventListener('click', () => {
+    if (pizzaOrder.amount > 0) {
+      pizzaOrder.amount--;
+    }
+    displayOrderForm();
+  });
+  pizzaLine.appendChild(decreaseButton);
+}
+
+function createIncreaseBtn(pizzaOrder, pizzaLine) {
+  let increaseButton = document.createElement('button');
+  increaseButton.classList.add('increase-Btn');
+  increaseButton.textContent = '+';
+  increaseButton.addEventListener('click', () => {
+    pizzaOrder.amount++;
+    displayOrderForm();
+  });
+  pizzaLine.appendChild(increaseButton);
+}
+
+function createDeleteBtn(pizzaOrder, pizzaLine, index) {
+  let deleteButton = document.createElement('button');
+  deleteButton.classList.add('delete-Btn');
+  deleteButton.textContent = 'Del';
+  deleteButton.addEventListener('click', () => {
+    order.splice(index, 1);
+    displayOrderForm();
+  });
+  pizzaLine.appendChild(deleteButton);
+}
+
 async function displayOrderForm() {
   let orderFormDiv = document.getElementById('orderForm');
   let orderSummaryDiv = document.getElementById('orderSummary');
@@ -115,7 +150,7 @@ async function displayOrderForm() {
 
     let overallTotal = 0;
 
-    // Add a line for each pizza in the order
+    // add a line for each pizza in the order
     order.forEach((pizzaOrder, index) => {
       let pizza = pizzas.find((pizza) => pizza.id === pizzaOrder.id);
       let totalPizzaPrice = (pizza.price * pizzaOrder.amount).toFixed(2);
@@ -130,32 +165,9 @@ async function displayOrderForm() {
       pizzaText.textContent = `${pizza.name}: ${pizzaOrder.amount} `;
       pizzaLine.appendChild(pizzaText);
 
-      let decreaseButton = document.createElement('button');
-      decreaseButton.classList.add('decrease-Btn');
-      decreaseButton.textContent = '-';
-      decreaseButton.addEventListener('click', () => {
-        pizzaOrder.amount--;
-        displayOrderForm(); // Refresh the form
-      });
-      pizzaLine.appendChild(decreaseButton);
-
-      let increaseButton = document.createElement('button');
-      increaseButton.classList.add('increase-Btn');
-      increaseButton.textContent = '+';
-      increaseButton.addEventListener('click', () => {
-        pizzaOrder.amount++;
-        displayOrderForm(); // Refresh the form
-      });
-      pizzaLine.appendChild(increaseButton);
-
-      let deleteButton = document.createElement('button');
-      deleteButton.classList.add('delete-Btn');
-      deleteButton.textContent = 'Delete';
-      deleteButton.addEventListener('click', () => {
-        order.splice(index, 1); // Remove this pizza from the order
-        displayOrderForm(); // Refresh the form
-      });
-      pizzaLine.appendChild(deleteButton);
+      createDecreaseBtn(pizzaOrder, pizzaLine);
+      createIncreaseBtn(pizzaOrder, pizzaLine);
+      createDeleteBtn(pizzaOrder, pizzaLine, index);
 
       let totalText = document.createElement('p');
       totalText.textContent = `Total: ${totalPizzaPrice} potatoes`;
