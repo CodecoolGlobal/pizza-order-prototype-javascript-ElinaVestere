@@ -11,6 +11,7 @@ let pizzas, allergens, orders;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // app.get('/', (req, res) => {
 //   const jsonData = fs.readFileSync('pizzas.json', 'utf8');
@@ -128,6 +129,10 @@ app.post('/api/order', (req, res) => {
 
     res.json(receivedOrder);
   });
+});
+
+app.get('/pages/menu.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/menu.html'));
 });
 
 app.listen(port, () => {

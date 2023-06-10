@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8" />
+  <title>Pizza Order Prototype</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="../public/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Amatic+SC" />
+  <script src="../public/w3script.js"></script>
+  <style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Amatic SC', sans-serif;
+    }
+  </style>
+  <body>
+    <!-- Start Content -->
+    <div class="main-container">
+      <div class="content">
+        <div id="home" class="w3-content">
+          <!-- Navbar (Sits on top) -->
+          <div class="w3-top w3-bar w3-xlarge w3-black w3-opacity-min">
+            <a href="#home" class="w3-bar-item w3-button">HOME</a>
+            <a href="#menu" class="w3-bar-item w3-button">MENU</a>
+            <a href="#about" class="w3-bar-item w3-button">ABOUT</a>
+            <a href="#contact" class="w3-bar-item w3-button">CONTACT</a>
+          </div>
+
+          <!-- Header image -->
+          <div
+            style="
+              height: 800px;
+              background-image: url('https://www.w3schools.com/w3images/pizza.jpg');
+              background-size: cover;
+            "
+            class="w3-display-container w3-grayscale-min">
+            <div class="w3-display-bottomleft">
+              <span class="w3-tag w3-xlarge">Open from 10am to 12pm</span>
+            </div>
+            <div class="w3-display-middle w3-center">
+              <span class="w3-text-white" style="font-size: 100px"
+                >thin<br />CRUST PIZZA</span
+              >
+              <p>
+                <a href="#menu" class="w3-button w3-xxlarge w3-black"
+                  >Let me see the menu</a
+                >
+              </p>
+            </div>
+          </div>
+          <!-- Menu -->
+          <div id="menu" class="w3-container w3-black w3-xxlarge w3-padding-64">
+            <h1 class="w3-center w3-jumbo w3-padding-32">THE MENU</h1>
+            <!-- Allergen Filter -->
+            <form id="filterForm" class="w3-container w3-margin w3-center">
+              <label for="allergenFilter" class="w3-text-light-grey"></label>
+              <select id="allergenFilter" name="allergen">
+                <!-- options will be filled in dynamically -->
+              </select>
+            </form>
+            <div class="w3-row w3-center w3-border w3-border-dark-grey">
+              <a href="#pizza"
+                ><div class="w3-third w3-padding-large w3-red">Pizza</div></a
+              >
+              <!-- pizzas & info will be filled in dynamically -->
+            </div>
+            <div id="pizza" class="w3-container w3-white w3-padding-32"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order -->
+      <div class="sidebar">
+        <div
+          id="orderForm"
+          class="w3-container w3-white w3-padding-32"
+          style="display: none">
+          <h1 class="w3-center w3-jumbo w3-padding-32">Your Order</h1>
+          <div id="orderSummary" class="w3-container w3-margin w3-center"></div>
+          <form id="customerForm" class="w3-container w3-margin w3-center">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" />
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" id="city" />
+            </div>
+            <div class="form-group">
+              <label for="street">Street</label>
+              <input type="text" id="street" />
+            </div>
+            <button type="button" onclick="submitOrder()">Submit Order</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="../public/script.js"></script>
+  </body>
+</html>
