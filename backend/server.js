@@ -112,7 +112,7 @@ app.post('/api/order', (req, res) => {
     minute: currentDate.getMinutes(),
   };
 
-  // Construct the new order object in the desired order
+  // construct the new order object in the desired order
   let newOrder = {
     id: receivedOrder.id,
     pizzas: receivedOrder.pizzas,
