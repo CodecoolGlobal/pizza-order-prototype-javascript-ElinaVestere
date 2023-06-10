@@ -51,12 +51,12 @@ function createPizzaDiv(pizzas) {
     pizzaDiv.innerHTML = `
       <h1>
         <b>${pizza.name}</b>
-        <span class="w3-right w3-tag w3-dark-grey w3-round">$${pizza.price.toFixed(
+        <span class="w3-right w3-tag w3-dark-grey w3-round">${pizza.price.toFixed(
           2
         )}</span>
       </h1>
       <p id="description" class="w3-text-grey">${pizza.description}</p>
-      <div id="ingredients" class="w3-text-grey">Ingredients: ${pizza.ingredients.join(
+      <div id="ingredients" class="w3-text-grey">Made with love and ${pizza.ingredients.join(
         ', '
       )}</div>
       <div id="allergens" class="w3-text-grey">Allergens: ${pizza.allergens
@@ -64,7 +64,7 @@ function createPizzaDiv(pizzas) {
         .join(', ')}</div>
         <label for="amount${pizza.id}">Amount:</label>
       <input id="amount${pizza.id}" type="number" min="1">
-      <button onclick="addToOrder(${pizza.id})">Add to order</button>
+      <button onclick="addToOrder(${pizza.id})">Add</button>
       <hr />
     `;
     pizzaListDiv.appendChild(pizzaDiv);
@@ -118,16 +118,20 @@ async function displayOrderForm() {
     // Add a line for each pizza in the order
     order.forEach((pizzaOrder, index) => {
       let pizza = pizzas.find((pizza) => pizza.id === pizzaOrder.id);
-      let totalPizzaPrice = pizza.price * pizzaOrder.amount;
-      overallTotal += totalPizzaPrice;
+      let totalPizzaPrice = (pizza.price * pizzaOrder.amount).toFixed(2);
+
+      overallTotal += parseFloat(totalPizzaPrice);
+      overallTotal = parseFloat(overallTotal.toFixed(2));
 
       let pizzaLine = document.createElement('div');
+      pizzaLine.classList.add('pizza-border');
 
-      let pizzaText = document.createElement('p');
-      pizzaText.textContent = `${pizza.name}: ${pizzaOrder.amount}, Total for this pizza: ${totalPizzaPrice}`;
+      let pizzaText = document.createElement('span');
+      pizzaText.textContent = `${pizza.name}: ${pizzaOrder.amount} `;
       pizzaLine.appendChild(pizzaText);
 
       let decreaseButton = document.createElement('button');
+      decreaseButton.classList.add('decrease-Btn');
       decreaseButton.textContent = '-';
       decreaseButton.addEventListener('click', () => {
         pizzaOrder.amount--;
@@ -136,6 +140,7 @@ async function displayOrderForm() {
       pizzaLine.appendChild(decreaseButton);
 
       let increaseButton = document.createElement('button');
+      increaseButton.classList.add('increase-Btn');
       increaseButton.textContent = '+';
       increaseButton.addEventListener('click', () => {
         pizzaOrder.amount++;
@@ -144,6 +149,7 @@ async function displayOrderForm() {
       pizzaLine.appendChild(increaseButton);
 
       let deleteButton = document.createElement('button');
+      deleteButton.classList.add('delete-Btn');
       deleteButton.textContent = 'Delete';
       deleteButton.addEventListener('click', () => {
         order.splice(index, 1); // Remove this pizza from the order
@@ -151,12 +157,16 @@ async function displayOrderForm() {
       });
       pizzaLine.appendChild(deleteButton);
 
+      let totalText = document.createElement('p');
+      totalText.textContent = `Total: ${totalPizzaPrice} potatoes`;
+      pizzaLine.appendChild(totalText);
+
       orderSummaryDiv.appendChild(pizzaLine);
     });
 
     // display the overall total cost
     let totalLine = document.createElement('p');
-    totalLine.textContent = `Overall total: ${overallTotal}`;
+    totalLine.textContent = `Overall total: ${overallTotal} potatoes`;
     orderSummaryDiv.appendChild(totalLine);
   } else {
     orderFormDiv.style.display = 'none';
@@ -180,8 +190,8 @@ async function submitOrder() {
       name,
       email,
       address: {
-        city,
         street,
+        city,
       },
     },
   };
