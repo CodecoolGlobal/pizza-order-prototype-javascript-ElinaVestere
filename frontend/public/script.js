@@ -1,7 +1,7 @@
 let pizzaListDiv = document.getElementById('pizza');
 let filterForm = document.getElementById('filterForm');
 let allergenFilter = document.getElementById('allergenFilter');
-let order = [];
+let orders = [];
 
 async function fetchData(url) {
   const response = await fetch(url);
@@ -87,13 +87,11 @@ function addToOrder(pizzaId) {
     return;
   }
 
-  // check if pizza already in order and update amount if it is
-  let existingPizzaOrder = order.find((po) => po.id === pizzaId);
+  let existingPizzaOrder = orders.find((po) => po.id === pizzaId);
   if (existingPizzaOrder) {
     existingPizzaOrder.amount += amount;
   } else {
-    // add pizza to order if it wasn't there before
-    order.push({ id: pizzaId, amount });
+    orders.push({ id: pizzaId, amount });
   }
 
   amountInput.value = '';
@@ -124,58 +122,77 @@ function createIncreaseBtn(pizzaOrder, pizzaLine) {
   pizzaLine.appendChild(increaseButton);
 }
 
-function createDeleteBtn(pizzaOrder, pizzaLine, index) {
+function createDeleteBtn(orders, pizzaLine, index) {
   let deleteButton = document.createElement('button');
   deleteButton.classList.add('delete-Btn');
   deleteButton.textContent = 'Del';
   deleteButton.addEventListener('click', () => {
-    pizzaOrder.splice(index, 1);
+    orders.splice(index, 1);
     displayOrderForm();
   });
   pizzaLine.appendChild(deleteButton);
+}
+
+function calculatePizzaPrice(pizzaOrder, pizzas) {
+  const pizza = pizzas.find((pizza) => pizza.id === pizzaOrder.id);
+  return parseFloat((pizza.price * pizzaOrder.amount).toFixed(2));
+}
+
+function calculateOverallTotal(orders, pizzas) {
+  return orders.reduce((acc, pizzaOrder) => {
+    const pizzaPrice = calculatePizzaPrice(pizzaOrder, pizzas);
+    return acc + pizzaPrice;
+  }, 0);
+}
+
+function createAndAppendPizzaText(pizzaLine, pizzaName, pizzaAmount) {
+  let pizzaText = document.createElement('span');
+  pizzaText.textContent = `${pizzaName}: ${pizzaAmount} `;
+  pizzaLine.appendChild(pizzaText);
+}
+
+function createAndAppendTotalText(pizzaLine, totalPizzaPrice) {
+  let totalText = document.createElement('p');
+  totalText.textContent = `Total: ${totalPizzaPrice} potatoes`;
+  pizzaLine.appendChild(totalText);
+}
+
+async function fetchPizzas() {
+  const pizzas = await fetchData('http://localhost:3000/pizza/list');
+  return pizzas;
 }
 
 async function displayOrderForm() {
   let orderFormDiv = document.getElementById('orderForm');
   let orderSummaryDiv = document.getElementById('orderSummary');
 
-  if (order.length > 0) {
+  if (orders.length > 0) {
     orderFormDiv.style.display = 'block';
-
-    let pizzas = await fetchData('http://localhost:3000/pizza/list');
+    let pizzas = await fetchPizzas();
 
     orderSummaryDiv.innerHTML = '';
 
     let overallTotal = 0;
 
-    // add a line for each pizza in the order
-    order.forEach((pizzaOrder, index) => {
-      let pizza = pizzas.find((pizza) => pizza.id === pizzaOrder.id);
-      let totalPizzaPrice = (pizza.price * pizzaOrder.amount).toFixed(2);
-
-      overallTotal += parseFloat(totalPizzaPrice);
-      overallTotal = parseFloat(overallTotal.toFixed(2));
+    orders.forEach((pizzaOrder, index) => {
+      const totalPizzaPrice = calculatePizzaPrice(pizzaOrder, pizzas);
+      overallTotal += totalPizzaPrice;
 
       let pizzaLine = document.createElement('div');
       pizzaLine.classList.add('pizza-border');
 
-      let pizzaText = document.createElement('span');
-      pizzaText.textContent = `${pizza.name}: ${pizzaOrder.amount} `;
-      pizzaLine.appendChild(pizzaText);
-
+      createAndAppendPizzaText(pizzaLine, pizza.name, pizzaOrder.amount);
       createDecreaseBtn(pizzaOrder, pizzaLine);
       createIncreaseBtn(pizzaOrder, pizzaLine);
-      createDeleteBtn(pizzaOrder, pizzaLine, index);
-
-      let totalText = document.createElement('p');
-      totalText.textContent = `Total: ${totalPizzaPrice} potatoes`;
-      pizzaLine.appendChild(totalText);
+      createDeleteBtn(orders, pizzaLine, index);
+      createAndAppendTotalText(pizzaLine, totalPizzaPrice);
 
       orderSummaryDiv.appendChild(pizzaLine);
     });
 
     let totalLine = document.createElement('p');
     totalLine.textContent = `Overall total: ${overallTotal} potatoes`;
+
     orderSummaryDiv.appendChild(totalLine);
   } else {
     orderFormDiv.style.display = 'none';
@@ -194,7 +211,7 @@ async function submitOrder() {
   }
 
   let orderDetails = {
-    pizzas: order,
+    pizzas: orders,
     customer: {
       name,
       email,
@@ -214,7 +231,7 @@ async function submitOrder() {
   });
 
   if (response.ok) {
-    order = [];
+    orders = [];
     alert('Order placed successfully');
   } else {
     alert('Failed to place order');

@@ -102,7 +102,6 @@ app.post('/api/order', (req, res) => {
   }
   receivedOrder.id = maxOrderId + 1 || 1;
 
-  // add date to the order
   const currentDate = new Date();
   receivedOrder.date = {
     year: currentDate.getFullYear(),
@@ -112,7 +111,6 @@ app.post('/api/order', (req, res) => {
     minute: currentDate.getMinutes(),
   };
 
-  // construct the new order object in the desired order
   let newOrder = {
     id: receivedOrder.id,
     pizzas: receivedOrder.pizzas,
@@ -120,17 +118,14 @@ app.post('/api/order', (req, res) => {
     customer: receivedOrder.customer,
   };
 
-  // push new order into orders list
   orders.push(newOrder);
 
-  // write the new orders list to the file
   fs.writeFile(ordersListPath, JSON.stringify(orders, null, 2), (err) => {
     if (err) {
       console.error('Error writing file:', err);
       return res.status(500).send(err);
     }
 
-    // if everything is okay, send the new order back to the client
     res.json(receivedOrder);
   });
 });
