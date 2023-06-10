@@ -129,7 +129,7 @@ function createDeleteBtn(pizzaOrder, pizzaLine, index) {
   deleteButton.classList.add('delete-Btn');
   deleteButton.textContent = 'Del';
   deleteButton.addEventListener('click', () => {
-    order.splice(index, 1);
+    pizzaOrder.splice(index, 1);
     displayOrderForm();
   });
   pizzaLine.appendChild(deleteButton);
@@ -142,10 +142,8 @@ async function displayOrderForm() {
   if (order.length > 0) {
     orderFormDiv.style.display = 'block';
 
-    // Get the list of pizzas to get their names
     let pizzas = await fetchData('http://localhost:3000/pizza/list');
 
-    // Reset the order summary
     orderSummaryDiv.innerHTML = '';
 
     let overallTotal = 0;
@@ -176,7 +174,6 @@ async function displayOrderForm() {
       orderSummaryDiv.appendChild(pizzaLine);
     });
 
-    // display the overall total cost
     let totalLine = document.createElement('p');
     totalLine.textContent = `Overall total: ${overallTotal} potatoes`;
     orderSummaryDiv.appendChild(totalLine);
