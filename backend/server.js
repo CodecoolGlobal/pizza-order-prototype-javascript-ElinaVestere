@@ -51,6 +51,7 @@ fs.readFile(ordersListPath, 'utf8', (err, data) => {
   orders = JSON.parse(data);
 });
 
+// task 1
 app.get('/api/pizza', (req, res) => {
   console.log('GET at /api/pizza');
 
@@ -63,48 +64,51 @@ app.get('/api/allergen', (req, res) => {
   res.json(allergens);
 });
 
-app.get('/pizza/list', (req, res) => {
-  console.log('GET at /pizza/list');
+// task 2
+function getAllergensForPizza(pizza, allergens) {
+  const pizzaAllergens = allergens.filter((allergen) =>
+    pizza.allergens.includes(allergen.id)
+  );
 
-  // find allergens
-  const getAllergensForPizza = (pizza) => {
-    const pizzaAllergens = allergens.filter((allergen) =>
-      pizza.allergens.includes(allergen.id)
-    );
+  return pizzaAllergens;
+}
 
-    return pizzaAllergens;
-  };
-
-  // add allergens to pizza
-  const pizzasWithAllergens = pizzas.map((pizza) => {
-    const allergenForThisPizza = getAllergensForPizza(pizza);
+function addAllergensToPizzas(pizzas, allergens) {
+  const pizzasWithAllergens = pizzas.map(function (pizza) {
+    const allergenForThisPizza = getAllergensForPizza(pizza, allergens);
     return { ...pizza, allergens: allergenForThisPizza };
   });
 
+  return pizzasWithAllergens;
+}
+
+app.get('/pizza/list', (req, res) => {
+  console.log('GET at /pizza/list');
+  const pizzasWithAllergens = addAllergensToPizzas(pizzas, allergens);
   res.json(pizzasWithAllergens);
 });
 
+// task 3
 app.get('/api/order', (req, res) => {
   console.log('GET at /api/order');
 
   res.json(orders);
 });
 
-app.post('/api/order', (req, res) => {
-  console.log('POST at /api/order');
-
-  let receivedOrder = req.body;
-
-  // simple id generation for new order
+function generateOrderId(order) {
   let maxOrderId = 0;
   if (orders.length > 0) {
     const orderIds = orders.map((order) => order.id);
     maxOrderId = Math.max(...orderIds);
   }
-  receivedOrder.id = maxOrderId + 1 || 1;
+  let newOrderId = maxOrderId + 1; /*|| 1 */
 
+  return newOrderId;
+}
+
+function generateCurrentDate() {
   const currentDate = new Date();
-  receivedOrder.date = {
+  let dateDetails = {
     year: currentDate.getFullYear(),
     month: currentDate.getMonth() + 1, // months are 0-based in JS
     day: currentDate.getDate(),
@@ -112,12 +116,28 @@ app.post('/api/order', (req, res) => {
     minute: currentDate.getMinutes(),
   };
 
+  return dateDetails;
+}
+
+function createNewOrder(receivedOrder) {
   let newOrder = {
     id: receivedOrder.id,
     pizzas: receivedOrder.pizzas,
     date: receivedOrder.date,
     customer: receivedOrder.customer,
   };
+
+  return newOrder;
+}
+
+app.post('/api/order', (req, res) => {
+  console.log('POST at /api/order');
+
+  let receivedOrder = req.body;
+
+  receivedOrder.id = generateOrderId(orders);
+  receivedOrder.date = generateCurrentDate();
+  let newOrder = createNewOrder(receivedOrder);
 
   orders.push(newOrder);
 
