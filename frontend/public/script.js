@@ -9,6 +9,7 @@ async function fetchData(url) {
   return data;
 }
 
+// task 2
 // allergens
 function createDefaultSelectOption() {
   let defaultOption = document.createElement('option');
@@ -77,7 +78,9 @@ async function fetchAndDisplayPizzas() {
   createPizzaDiv(pizzas);
 }
 
+// task 4
 // orders
+// functions
 function addToOrder(pizzaId) {
   let amountInput = document.getElementById(`amount${pizzaId}`);
   let amount = Number(amountInput.value);
@@ -87,7 +90,9 @@ function addToOrder(pizzaId) {
     return;
   }
 
-  let existingPizzaOrder = orders.find((po) => po.id === pizzaId);
+  let existingPizzaOrder = orders.find(
+    (pizzaOrder) => pizzaOrder.id === pizzaId
+  );
   if (existingPizzaOrder) {
     existingPizzaOrder.amount += amount;
   } else {
@@ -139,10 +144,12 @@ function calculatePizzaPrice(pizzaOrder, pizzas) {
 }
 
 function calculateOverallTotal(orders, pizzas) {
-  return orders.reduce((acc, pizzaOrder) => {
+  let total = orders.reduce((acc, pizzaOrder) => {
     const pizzaPrice = calculatePizzaPrice(pizzaOrder, pizzas);
     return acc + pizzaPrice;
   }, 0);
+
+  return parseFloat(total.toFixed(2));
 }
 
 function createAndAppendPizzaText(pizzaLine, pizzaName, pizzaAmount) {
@@ -157,6 +164,60 @@ function createAndAppendTotalText(pizzaLine, totalPizzaPrice) {
   pizzaLine.appendChild(totalText);
 }
 
+function createPizzaLineElement(pizzaOrder, pizzas, index) {
+  const pizzaLine = document.createElement('div');
+  pizzaLine.classList.add('pizza-border');
+
+  const pizza = pizzas.find((pizza) => pizza.id === pizzaOrder.id);
+
+  createAndAppendPizzaText(pizzaLine, pizza.name, pizzaOrder.amount);
+  createDecreaseBtn(pizzaOrder, pizzaLine);
+  createIncreaseBtn(pizzaOrder, pizzaLine);
+  createDeleteBtn(orders, pizzaLine, index);
+
+  return pizzaLine;
+}
+
+function appendOverallTotal(orderSummaryDiv, overallTotal) {
+  let totalLine = document.createElement('p');
+  totalLine.textContent = `Overall total: ${overallTotal} potatoes`;
+  orderSummaryDiv.appendChild(totalLine);
+}
+
+function handleOrderResponse(response) {
+  if (response.ok) {
+    orders = [];
+    alert('Order placed successfully');
+  } else {
+    alert('Failed to place order');
+  }
+}
+
+function getOrderDetailsFromForm() {
+  let name = document.getElementById('name').value;
+  let email = document.getElementById('email').value;
+  let city = document.getElementById('city').value;
+  let street = document.getElementById('street').value;
+
+  if (!name || !email || !city || !street) {
+    alert('Please fill in all fields');
+    return null;
+  }
+
+  return {
+    pizzas: orders,
+    customer: {
+      name,
+      email,
+      address: {
+        street,
+        city,
+      },
+    },
+  };
+}
+
+// async functions
 async function fetchPizzas() {
   const pizzas = await fetchData('http://localhost:3000/pizza/list');
   return pizzas;
@@ -169,59 +230,26 @@ async function displayOrderForm() {
   if (orders.length > 0) {
     orderFormDiv.style.display = 'block';
     let pizzas = await fetchPizzas();
-
     orderSummaryDiv.innerHTML = '';
-
     let overallTotal = 0;
 
     orders.forEach((pizzaOrder, index) => {
       const totalPizzaPrice = calculatePizzaPrice(pizzaOrder, pizzas);
-      overallTotal += totalPizzaPrice;
+      const pizzaLine = createPizzaLineElement(pizzaOrder, pizzas, index);
 
-      let pizzaLine = document.createElement('div');
-      pizzaLine.classList.add('pizza-border');
-
-      createAndAppendPizzaText(pizzaLine, pizza.name, pizzaOrder.amount);
-      createDecreaseBtn(pizzaOrder, pizzaLine);
-      createIncreaseBtn(pizzaOrder, pizzaLine);
-      createDeleteBtn(orders, pizzaLine, index);
       createAndAppendTotalText(pizzaLine, totalPizzaPrice);
+      overallTotal += totalPizzaPrice;
 
       orderSummaryDiv.appendChild(pizzaLine);
     });
 
-    let totalLine = document.createElement('p');
-    totalLine.textContent = `Overall total: ${overallTotal} potatoes`;
-
-    orderSummaryDiv.appendChild(totalLine);
+    appendOverallTotal(orderSummaryDiv, overallTotal);
   } else {
     orderFormDiv.style.display = 'none';
   }
 }
 
-async function submitOrder() {
-  let name = document.getElementById('name').value;
-  let email = document.getElementById('email').value;
-  let city = document.getElementById('city').value;
-  let street = document.getElementById('street').value;
-
-  if (!name || !email || !city || !street) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  let orderDetails = {
-    pizzas: orders,
-    customer: {
-      name,
-      email,
-      address: {
-        street,
-        city,
-      },
-    },
-  };
-
+async function submitOrderDetails(orderDetails) {
   let response = await fetch('http://localhost:3000/api/order', {
     method: 'POST',
     headers: {
@@ -230,13 +258,18 @@ async function submitOrder() {
     body: JSON.stringify(orderDetails),
   });
 
-  if (response.ok) {
-    orders = [];
-    alert('Order placed successfully');
-  } else {
-    alert('Failed to place order');
+  return response;
+}
+
+async function submitOrder() {
+  let orderDetails = getOrderDetailsFromForm();
+
+  if (!orderDetails) {
+    return;
   }
 
+  let response = await submitOrderDetails(orderDetails);
+  handleOrderResponse(response);
   displayOrderForm();
 }
 
